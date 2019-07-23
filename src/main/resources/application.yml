@@ -1,0 +1,9 @@
+# General configuration
+server:
+  port: 9090
+  servlet:
+    context-path: /uitcloud/
+
+logging:
+  config: classpath:log4j.properties
+

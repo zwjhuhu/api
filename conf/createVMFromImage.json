@@ -1,0 +1,17 @@
+{
+	"name": "String_[a-z0-9-]{32}_NotNull",
+	"createAndStartVM": {
+		"calculationSpecification" : {
+			"cpu": "Integer_[1-16]_NotNull",
+			"memory":"Integer_[512-999]\\d|[1000-9999]\\d|[10000-32768]\\d_NotNull",
+			"diskBandwidth": "Integer_[512-999]\\d|[1000-9999]\\d|[10000-32768]\\d_NotNull",
+			"readingSpeed": "Integer_[100-999]\\d|[1000-1024]\\d",
+			"writeSpeed": "Integer_[10-99]\\d|[100-999]\\d|[1000-1024]\\d",
+			"upstreamBandwidth": "Integer_[10-99]|\\d[100-999]\\d|[1000-1024]\\d",
+			"downstreamBandwidth": "Integer_[10-99]|\\d[100-999]\\d|[1000-1024]\\d"
+		},
+		"RootCloudDiskSpecification": {
+			"capacity": "[10240-99999]\\d|[100000-204800]\\d_NotNull"
+		}
+	}
+}
