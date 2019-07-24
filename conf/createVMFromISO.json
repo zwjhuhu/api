@@ -1,7 +1,9 @@
 {
 	"name": "String_[a-z0-9-]{32}_NotNull",
 	"createAndStartVM": {
-		"calculationSpecification" : {
+		"image": "String_[a-z0-9A_Z-/.]{2,1024}_NotNull",
+		"network": "",
+	    "calculationSpecification" : {
 			"cpu": "Integer_[1-16]_NotNull",
 			"memory":"Integer_[512-999]\\d|[1000-9999]\\d|[10000-32768]\\d_NotNull",
 			"diskBandwidth": "Long_[512-999]\\d|[1000-9999]\\d|[10000-32768]\\d_NotNull",

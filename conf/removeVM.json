@@ -1,3 +1,4 @@
 {
-	"name": "String_[a-z0-9-]{32}_NotNull"
+	"name": "String_[a-z0-9-]{32}_NotNull",
+	"RemoveVMOptions": {}
 }

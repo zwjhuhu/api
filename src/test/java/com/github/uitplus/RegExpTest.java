@@ -26,7 +26,7 @@ public class RegExpTest {
 		checkEnum();
 	}
 
-	protected static void checkEnum() {
+	protected static void checkEnum()  {
 		Pattern r = Pattern.compile(ENUM_PATTERN);
 		System.out.println(r.matcher("qcow2").matches());
 	}
