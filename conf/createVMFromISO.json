@@ -1,19 +1,59 @@
 {
 	"name": "String_[a-z0-9-]{32}_NotNull",
 	"createAndStartVM": {
-		"image": "String_[a-z0-9A_Z-/.]{2,1024}_NotNull",
-		"network": "",
-	    "calculationSpecification" : {
+		"basic" : {
 			"cpu": "Integer_[1-16]_NotNull",
 			"memory":"Integer_[512-999]\\d|[1000-9999]\\d|[10000-32768]\\d_NotNull",
-			"diskBandwidth": "Long_[512-999]\\d|[1000-9999]\\d|[10000-32768]\\d_NotNull",
-			"readingSpeed": "Long_[100-999]\\d|[1000-1024]\\d",
-			"writeSpeed": "Long_[10-99]\\d|[100-999]\\d|[1000-1024]\\d",
-			"upstreamBandwidth": "Long_[10-99]|\\d[100-999]\\d|[1000-1024]\\d",
-			"downstreamBandwidth": "Long_[10-99]|\\d[100-999]\\d|[1000-1024]\\d"
+			"cpuset": "String_[a-z0-9,-]{2,16}"
 		},
-		"RootCloudDiskSpecification": {
-			"capacity": "Long_[10240-99999]\\d|[100000-204800]\\d_NotNull"
+		"networks": [
+			{
+		    	"network": "String_[a-z0-9]{2,16}_NotNull",
+		    	"upstreamBandwidth": "Long_[100-999]\\d|[1000-1024]\\d",
+		    	"downstreamBandwidth": "Long_[100-999]\\d|[1000-1024]\\d"
+			},
+			{
+		    	"network": "String_[a-z0-9]{2,16}_NotNull",
+		    	"upstreamBandwidth": "Long_[100-999]\\d|[1000-1024]\\d",
+		    	"downstreamBandwidth": "Long_[100-999]\\d|[1000-1024]\\d"
+			}
+		],
+		"RootCloudDiskSpecificationFromISO": {
+			"image": "String_[a-z0-9A_Z-/.]{2,1024}_NotNull",
+			"capacity": "Long_[10240-99999]\\d|[100000-204800]\\d_NotNull",
+			"readingSpeed": "Long_[100-999]\\d|[1000-1024]\\d",
+			"writeSpeed": "Long_[10-99]\\d|[100-999]\\d|[1000-1024]\\d"
+		},
+		"dataCloudDiskSpecifications": [
+			{
+				"capacity": "Long_[10240-99999]\\d|[100000-204800]\\d_NotNull",
+				"readingSpeed": "Long_[100-999]\\d|[1000-1024]\\d",
+				"writeSpeed": "Long_[10-99]\\d|[100-999]\\d|[1000-1024]\\d"
+			}, 
+			{
+				"capacity": "Long_[10240-99999]\\d|[100000-204800]\\d_NotNull",
+				"readingSpeed": "Long_[100-999]\\d|[1000-1024]\\d",
+				"writeSpeed": "Long_[10-99]\\d|[100-999]\\d|[1000-1024]\\d"
+			}
+		],
+	    "cdroms": [
+			{
+				"name": "String_[a-z0-9-]{32}",
+				"iso" : "String_[a-z0-9A_Z-/.]{2,1024}"
+		    },
+		    {
+				"name": "String_[a-z0-9-]{32}",
+				"iso" : "String_[a-z0-9A_Z-/.]{2,1024}"
+		    }
+		],
+		"console": {
+			"vnc" : {
+				"consolePassword": "String_[a-z0-9A_Z-/.]{6,18}"
+			},
+			"spice": {
+				"consolePassword": "String_[a-z0-9A_Z-/.]{6,18}",
+				"usbRedirect": "Boolean"
+			}
 		}
 	}
 }
