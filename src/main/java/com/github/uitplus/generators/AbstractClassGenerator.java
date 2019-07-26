@@ -46,7 +46,7 @@ public abstract class AbstractClassGenerator {
 	
 	public final static String DEFAULT_ANNOTATION = "";
 	
-	public final static String CLASS = "\npublic class CLASS {\n";
+	public final static String CLASS = "\npublic static class CLASS {\n";
 
 	protected final static Set<String> packages = new HashSet<String>();
 	
@@ -60,16 +60,26 @@ public abstract class AbstractClassGenerator {
 	protected final StringBuffer msb = new StringBuffer();
 	
 	
+	public AbstractClassGenerator(String pkg) {
+	}
 	/**
 	 * @param pkg
 	 * @param clazz
 	 */
 	public AbstractClassGenerator(String pkg, String clazz) {
+		this(pkg, clazz, false);
+	}
+	
+	public AbstractClassGenerator(String pkg, String clazz, boolean isStatic) {
 		dsb.append(COPYRIGHT)
 			.append(PACKAGE.replaceAll("PACKAGE", pkg))
 			.append(getImports())
-			.append(AUTHOR)
-			.append(CLASS.replaceAll("CLASS", clazz));
+			.append(AUTHOR);
+		if (isStatic) {
+			dsb.append(CLASS.replaceAll("CLASS", clazz));
+		} else {
+			dsb.append(CLASS.replace("static", "").replaceAll("CLASS", clazz));
+		}
 	}
 	
 	/**

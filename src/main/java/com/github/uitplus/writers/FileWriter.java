@@ -29,13 +29,23 @@ public class FileWriter {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		BeanGenerator gen = new BeanGenerator("com.github.uitplus.beans", "CreateVMFromImage");
+		BeanGenerator gen = new BeanGenerator("com.github.uitplus.beans");
 		Map<String, Object> object = JSON.parseObject(new FileInputStream(
 				new File("conf/createVMFromImage.json")), Map.class);
 		
 		FileWriter writer = new FileWriter();
 		writer.write("com.github.uitplus.beans", 
-				"CreateVMFromImage", gen.autoGen(object));
+				"CreateVMFromImage", 
+				gen.autoGen(object, "CreateVMFromImage"));
+		
+		BeanGenerator gen1 = new BeanGenerator("com.github.uitplus.beans");
+		Map<String, Object> object1 = JSON.parseObject(new FileInputStream(
+				new File("conf/createVMFromISO.json")), Map.class);
+		
+		FileWriter writer1 = new FileWriter();
+		writer.write("com.github.uitplus.beans", 
+				"CreateVMFromISO", 
+				gen.autoGen(object1, "CreateVMFromISO"));
 	}
 
 }

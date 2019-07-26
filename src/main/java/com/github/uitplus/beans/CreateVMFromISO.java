@@ -9,21 +9,13 @@ import java.util.regex.Pattern;
  *
  */
 
-public class CreateVMFromImage {
-
-	protected CreateAndStartVMFromTemplate CreateAndStartVMFromTemplate;
+public class CreateVMFromISO {
 
 	protected String name;
 
-	public CreateVMFromImage() {
-	}
+	protected CreateAndStartVMFromISO createAndStartVMFromISO;
 
-	public void setCreateAndStartVMFromTemplate(CreateAndStartVMFromTemplate CreateAndStartVMFromTemplate) {
-		this.CreateAndStartVMFromTemplate = CreateAndStartVMFromTemplate;
-	}
-
-	public CreateAndStartVMFromTemplate getCreateAndStartVMFromTemplate() {
-		return this.CreateAndStartVMFromTemplate;
+	public CreateVMFromISO() {
 	}
 
 	public void setName(String name) {
@@ -38,13 +30,21 @@ public class CreateVMFromImage {
 		return this.name;
 	}
 
-	public static class CreateAndStartVMFromTemplate {
+	public void setCreateAndStartVMFromISO(CreateAndStartVMFromISO createAndStartVMFromISO) {
+		this.createAndStartVMFromISO = createAndStartVMFromISO;
+	}
+
+	public CreateAndStartVMFromISO getCreateAndStartVMFromISO() {
+		return this.createAndStartVMFromISO;
+	}
+
+	public static class CreateAndStartVMFromISO {
 
 		protected Console console;
 
 		protected ArrayList<Cdroms> cdroms;
 
-		protected RootCloudDiskSpecificationFromTemplate RootCloudDiskSpecificationFromTemplate;
+		protected RootCloudDiskSpecificationFromISO RootCloudDiskSpecificationFromISO;
 
 		protected Basic basic;
 
@@ -52,7 +52,7 @@ public class CreateVMFromImage {
 
 		protected ArrayList<DataCloudDiskSpecifications> dataCloudDiskSpecifications;
 
-		public CreateAndStartVMFromTemplate() {
+		public CreateAndStartVMFromISO() {
 		}
 
 		public void setConsole(Console console) {
@@ -71,13 +71,13 @@ public class CreateVMFromImage {
 			return this.cdroms;
 		}
 
-		public void setRootCloudDiskSpecificationFromTemplate(
-				RootCloudDiskSpecificationFromTemplate RootCloudDiskSpecificationFromTemplate) {
-			this.RootCloudDiskSpecificationFromTemplate = RootCloudDiskSpecificationFromTemplate;
+		public void setRootCloudDiskSpecificationFromISO(
+				RootCloudDiskSpecificationFromISO RootCloudDiskSpecificationFromISO) {
+			this.RootCloudDiskSpecificationFromISO = RootCloudDiskSpecificationFromISO;
 		}
 
-		public RootCloudDiskSpecificationFromTemplate getRootCloudDiskSpecificationFromTemplate() {
-			return this.RootCloudDiskSpecificationFromTemplate;
+		public RootCloudDiskSpecificationFromISO getRootCloudDiskSpecificationFromISO() {
+			return this.RootCloudDiskSpecificationFromISO;
 		}
 
 		public void setBasic(Basic basic) {
@@ -204,29 +204,29 @@ public class CreateVMFromImage {
 			}
 		}
 
-		public static class RootCloudDiskSpecificationFromTemplate {
+		public static class RootCloudDiskSpecificationFromISO {
 
-			protected String template;
+			protected String image;
 
 			protected Long writeSpeed;
 
 			protected Long readingSpeed;
 
-			protected String target;
+			protected Long capacity;
 
-			public RootCloudDiskSpecificationFromTemplate() {
+			public RootCloudDiskSpecificationFromISO() {
 			}
 
-			public void setTemplate(String template) {
+			public void setImage(String image) {
 				Pattern p = Pattern.compile("[a-z0-9A_Z-/.]{2,1024}");
-				if (!p.matcher(String.valueOf(template)).matches()) {
+				if (!p.matcher(String.valueOf(image)).matches()) {
 					throw new RuntimeException("Invalid parameter.");
 				}
-				this.template = template;
+				this.image = image;
 			}
 
-			public String getTemplate() {
-				return this.template;
+			public String getImage() {
+				return this.image;
 			}
 
 			public void setWriteSpeed(Long writeSpeed) {
@@ -253,16 +253,16 @@ public class CreateVMFromImage {
 				return this.readingSpeed;
 			}
 
-			public void setTarget(String target) {
-				Pattern p = Pattern.compile("[a-z0-9A_Z-/.]{2,1024}");
-				if (!p.matcher(String.valueOf(target)).matches()) {
+			public void setCapacity(Long capacity) {
+				Pattern p = Pattern.compile("[10-99]d|[100-200]d");
+				if (!p.matcher(String.valueOf(capacity)).matches()) {
 					throw new RuntimeException("Invalid parameter.");
 				}
-				this.target = target;
+				this.capacity = capacity;
 			}
 
-			public String getTarget() {
-				return this.target;
+			public Long getCapacity() {
+				return this.capacity;
 			}
 		}
 
