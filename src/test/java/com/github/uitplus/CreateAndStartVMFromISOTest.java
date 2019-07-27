@@ -1,0 +1,106 @@
+/**
+ * Copyright (2019, ) Institute of Software, Chinese Academy of Sciences
+ */
+package com.github.uitplus;
+
+import java.util.ArrayList;
+
+import com.github.kubesys.kubernetes.ExtendedKubernetesClient;
+import com.github.kubesys.kubernetes.api.model.virtualmachine.Lifecycle.CreateAndStartVMFromISO;
+import com.github.uitplus.beans.CreateVMFromISOBean;
+import com.github.uitplus.beans.CreateVMFromISOBean.Cdroms;
+import com.github.uitplus.beans.CreateVMFromISOBean.Console;
+import com.github.uitplus.beans.CreateVMFromISOBean.Console.Vnc;
+import com.github.uitplus.utils.BeanConvertorUtils;
+import com.github.uitplus.beans.CreateVMFromISOBean.Cpu;
+import com.github.uitplus.beans.CreateVMFromISOBean.DataCloudDiskSpecifications;
+import com.github.uitplus.beans.CreateVMFromISOBean.Network;
+import com.github.uitplus.beans.CreateVMFromISOBean.RootCloudDiskSpecificationFromISO;
+
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.ConfigBuilder;
+
+/**
+ * @author wuheng
+ * @since  2019.7.27
+ */
+public class CreateAndStartVMFromISOTest  {
+
+	public static void main(String[] args) throws Exception {
+		ExtendedKubernetesClient client = getClient();
+		CreateVMFromISOBean bean = get();
+		client.virtualMachines().createAndStartVMFromISO(bean.getName(), 
+				BeanConvertorUtils.toCreateAndStartVMFromISO(bean));
+	}
+	
+	public static CreateVMFromISOBean get() {
+		CreateVMFromISOBean image = new CreateVMFromISOBean();
+		image.setName("750646e8c17a49d0b83c1c797811e068");
+		image.setOs("centos7.0");
+		
+		Cpu cpu = new Cpu();
+		cpu.setCpunum(4);
+		cpu.setCpuset("1-4");
+		image.setCpu(cpu );
+		image.setMemory(2048);
+		image.setIso("/opt/ISO/CentOS-7-x86_64-Minimal-1511.iso");
+		
+		ArrayList<Network> networks = new ArrayList<Network>();
+		Network n1 = new Network();
+		n1.setBridge("virbr0");
+		Network n2 = new Network();
+		n2.setBridge("virbr0");
+		networks.add(n1);
+		networks.add(n2);
+		image.setNetwork(networks );
+		
+		ArrayList<DataCloudDiskSpecifications> dataCloudDiskSpecifications = new ArrayList<DataCloudDiskSpecifications>();
+		DataCloudDiskSpecifications dataDisk1 = new DataCloudDiskSpecifications();
+		dataDisk1.setCapacity(20L);
+		dataDisk1.setReadingSpeed(20480000L);
+		dataDisk1.setWriteSpeed(20480000L);
+		DataCloudDiskSpecifications dataDisk2 = new DataCloudDiskSpecifications();
+		dataDisk2.setCapacity(40L);
+		dataDisk2.setReadingSpeed(20480000L);
+		dataDisk2.setWriteSpeed(20480000L);
+		dataCloudDiskSpecifications.add(dataDisk1);
+		dataCloudDiskSpecifications.add(dataDisk2);
+		image.setDataCloudDiskSpecifications(dataCloudDiskSpecifications );
+		
+		ArrayList<Cdroms> cdroms = new ArrayList<Cdroms>();
+		Cdroms cd1 = new Cdroms();
+		cd1.setIso("/opt/ISO/CentOS-7-x86_64-Minimal-1511.iso");
+		Cdroms cd2 = new Cdroms();
+		cd2.setIso("/opt/ISO/CentOS-7-x86_64-Minimal-1511.iso");
+		cdroms.add(cd1);
+		cdroms.add(cd2);
+		image.setCdroms(cdroms );
+		
+		RootCloudDiskSpecificationFromISO sysdisk = new RootCloudDiskSpecificationFromISO();
+		sysdisk.setCapacity(10L);
+		sysdisk.setReadingSpeed(20480000L);
+		sysdisk.setWriteSpeed(20480000L);
+		image.setRootCloudDiskSpecificationFromISO(sysdisk);
+		
+		Console console = new Console();
+		Vnc vnc = new Vnc();
+		vnc.setConsolePassword("123456");
+		console.setVnc(vnc );
+		image.setConsole(console );
+		
+		return image;
+	}
+	
+	
+	public static Config config = new ConfigBuilder()
+			.withApiVersion("v1")
+			.withCaCertData("LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRFNU1EY3lOakEzTVRneE5Wb1hEVEk1TURjeU16QTNNVGd4TlZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTy9LCkJkTGlnVS9ZbEcrTTFGbzV6Y3FOZ3FNZFk2TE5JaCsvMlEyMVJIVkkzNitxTFgyaSt3RTAwN0hEeW5ZSnlTaW8KaGJ5NVNKMHZvTjBsS2c5Z1pEMmh0WG9LRWFsVmJkU3ZCVTQrRmNhcFZSTkZhcm5Ta1hWQXJReVVDNHYrSmFrRwp4QXl2L3FHdHlVSkwrVnlMK0d2bFBlYmJqTml6dGpHY0RSS0laeDlTdUNubXVmUE9PZ29UNGZ6TFFEejNMUG9yClFoOW1rSlFCYkl0QjR5M2tDdWtLWk8yY0NueThMdStWa2oyekZnM3NRZTVVUEw3NmVybWIvYm82TVZ5bitQaHcKT1FmdWxPTVNBcnF4RTVnRk56d2NmcEI5cnRQd3ZseEY1bTA5R0xCMGRpUXJrQkZ4UXdEL3ZZVE5iZTBNdW1xRQpqQUdEV0sraDBqdlZRNi9FNktrQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFBcEU1L1BhandPaVBNbnlubVVXOHpXdmRBUkoKRUh1VGhDSkdHTHNMaUtvSHZTNTMwRW9BbFkvV2w4UW9FZFNXcTJrTW5HOWhuWDRRbDZKSlJQWTQvaVpEM0xiOQpOQlFBSXJKK0IvbFZaeTZHR0tEa21LdFJKdDM3MW44bHg1TTFxMTZST0dwdTR5U0E1V2NSSjh0QlhWZkdZOU9wClA0V3BtZXlnMUVNUzh1dmNXVXVQRC9EQ1lsNy8zMWg2WW5VL2VHRmFpTzRyQ1ZyRTRxMmFjWW1nU21sTmRYNnkKVjA3RUhFSXRaWXdsNlNkN2x6YWJnOW52cnhaQ1lITFQ4cjBqaTk2Ni9ldzVXaFJXTHF3RUFXbmVmWTJKcUtTZwp6aFE3ejBFMDNBblBWUXdNL3NUTHdLdGtsZGVrbVVFNFJXRGRyTHFmQmxucFl1SU5TRmE3VEFMOTVsOD0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=")
+			.withClientCertData("LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM4akNDQWRxZ0F3SUJBZ0lJUGsyK2lBNjRiRUV3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB4T1RBM01qWXdOekU0TVRWYUZ3MHlNREEzTWpVd056RTRNVGRhTURReApGekFWQmdOVkJBb1REbk41YzNSbGJUcHRZWE4wWlhKek1Sa3dGd1lEVlFRREV4QnJkV0psY201bGRHVnpMV0ZrCmJXbHVNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXQ0VU52ZWc0WFlYS0lEWHUKV1FySUwyRXArMldLOFpSbTg0RUdjRlUyKzFMMTRhT3lON2p3dFlGRmZzY3hsclhhQVdEeEVsaTk4TkxBRHpJMwpHVkdabkVZYURVRU44MFArRk5JcUNYUGhUNjZVL1FXUGZiRzVBdmVUOFBaYk0zbmlYWjJCbWhDcGMrTXZ2LzA4Ck5lc3ludjFoSmNLdHBDU0ZKanFEc3ZzWDJOazI3Zit2Rkd5dkFJanMyMTdyc1lGMmVodWllQStwUGNZbmZFbkEKRCsrQVRxRFZQQkZ3ZzVGUCtUOVg5MVY3Z3pBZGR5SXMrajMrZ1pYazJGeWFyUmNDRFlrT3pHb1JzM1BuRHZ4bwp3YXdmc0I2eENyODJXeDNCeUVSdy82TU02OXFXSllzQWd4WmdYM2pCeTZXOGhCTGMrd2dkcTlDZk11MFkrckFWClBXeTdjUUlEQVFBQm95Y3dKVEFPQmdOVkhROEJBZjhFQkFNQ0JhQXdFd1lEVlIwbEJBd3dDZ1lJS3dZQkJRVUgKQXdJd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFFSEI0N2ZtTCsvSGRuNGoyanVjeTFLWEx4QnEyUHZ4ZnhoawpBeU1hc3dlTlB5dWtBZEpNeitPengzTjJxOG9qRUl0Z2J2QnJrUWRtU2tBZGtVTjY4cmpSK2ZtR1pIWFBrbGhHCjJlR3JCc25pMFZ5Y1JHNXphMHZudVZocHdVOEEyUFhBbG9CaXBydnppZFJDMXdCYVFVWURhT1BFeSs3c3VnQjcKK3lacGl6UmwzVFdZT0ZGS3lzZ1pNTzRya3VIb2VyclZlQk5aQlVvb1Z5U2RqUFRxZEpUb0hlYWVNVHBacThLbwppYXZHZEJ5cjdhME54SWEvYkpZS0pEcEVnSStDa3JBQzA1aUV5UzJ6MHhYVFllL0k2TG1TUnFnN1hIb2ROMVQrCnBjZWphNHhINEZvdy9MK2xnQUdQRTRDYUg5ODZXMHYzdXVEU2RKTDVsOEtXcnpDekFjVT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=")
+			.withClientKeyData("LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBdDRVTnZlZzRYWVhLSURYdVdRcklMMkVwKzJXSzhaUm04NEVHY0ZVMisxTDE0YU95Ck43and0WUZGZnNjeGxyWGFBV0R4RWxpOThOTEFEekkzR1ZHWm5FWWFEVUVOODBQK0ZOSXFDWFBoVDY2VS9RV1AKZmJHNUF2ZVQ4UFpiTTNuaVhaMkJtaENwYytNdnYvMDhOZXN5bnYxaEpjS3RwQ1NGSmpxRHN2c1gyTmsyN2YrdgpGR3l2QUlqczIxN3JzWUYyZWh1aWVBK3BQY1luZkVuQUQrK0FUcURWUEJGd2c1RlArVDlYOTFWN2d6QWRkeUlzCitqMytnWlhrMkZ5YXJSY0NEWWtPekdvUnMzUG5Ednhvd2F3ZnNCNnhDcjgyV3gzQnlFUncvNk1NNjlxV0pZc0EKZ3haZ1gzakJ5Nlc4aEJMYyt3Z2RxOUNmTXUwWStyQVZQV3k3Y1FJREFRQUJBb0lCQUNxOERBZ2w5RUlxN25kegp0NDM2aWNVbXJoMEJkMHBzRVZFd3dXd1ZHOW1JWndObEdCSUx1ZG02UVpHVkZ3SU9WTGF2ZVZPWllKbWNxZWFmCi9kNmlkcy9DTHp6WTRrTzhtSVVHcjQxRjg3aVhZZEJOcEMxVDNrNUhrcWF3NTJua1B3Y25yMDlPQS9lZGRyZ1IKWXh6M0tQR0c5VUZTeFJhTS9vaDVaY09lM3QyNnlocUsxakpOVElscU85OWpDa3ZIVWp2TTg2cU5TUGkvdDNWVwpXNWhiVFllRUp0NFRTWTY0b1BkMXhsNkx4akxGSldEdnJLNjkzZ2FVd1RuMzRHMmJmNmllS2VleGxMditNU0NoCi9LQ0JtczZTWEIwMmcybjFCYkJXc09JOERMN3JDN1dzcFh4U242UTByRDM4WVk1enk0ZThvS0g5Zm8vbnVxTFgKWmNoSmY5VUNnWUVBejZtR2duVW0yRjlKaUpLTTVuRkdHUjlYTENGclArQzFaSUlDVkVqdS9VZVZQWDhKaitYSwpPbWtPdmdDVDhVQ0MvOXFvQ0lzandXMmdweTdhWFd0bDZJL1R1QW9Ba0dEVmIrYUFCeW15RFJtSnBBMG1Hb2t6ClZmZ1EwN08vbFZKOGw2SlJ2cVJrWVJNb3FRZHFkR0xUSml6cXNnOVUwSVlpQjhJWGNxUXF3aDhDZ1lFQTRqemsKWXVjdGtXZTJ4ZWMrTUl5MjdYS3JHNVFTZ3pJMkRHcXduZWU3TjVQYnNieEtRdXFhWW5saFp2SkdWV1RiZ3lHQQpFZm1KRzJkSU1nWnNMSDJQN20yZjB5bmpPNHY1SmQ3WHR5L205ZnYzV3pPcllmYllzallFcUhnK0FFT0l1YzdKCndLdklNTjdWMmZOZ0FtcXFqWkJVcTVqQjZxcFcxNnlMQU9scmNHOENnWUVBdnkwRWhpbXdIMVpwN2U5dEErR1kKZFJ4ak5sOTF5eExtSzZkODJYZGpmWTFmR1lSUW0wY2ppKzZZQWRlcVcxbld3QkRlelM2N05pSGsyc1RKaDJPTwpLREh3NmVkYmFZK2NMeTUzQXlFaHArbXd5M1RIZFhxRjVray94SVlnaENteVJpN0xMc1ZOSEFsMVQxZGlhODluCk1DZjkwUHRJUzhpUW42L1J3bHJjZW1VQ2dZRUFnYzN5TkJUei9qT0ZtTEwrNlpneTlMWVFHcml3am5ubXJPVWkKQk5lS2dXN2laRzNtSmRLNVZiclMrZUFVSHJiSmc4bGEwL1ZhaDFDUkNiTEpxaFU0MmRJb0cxNHpORjB4VEZzNQpaYStrVW9xSTk5a0RnaWZCV1M3SktXZ2tHcjZrMmdjZGx1QjQ4aUZJamM2bnpYc3A5Q05Wa1VjS0svd2o2NGJpCkVsbmEvUjBDZ1lFQXVZMEwwUy81RXpKTHhST21LN0xpaHNrRUw5QS8xRU5GSXlseTcvakV3aTBGWjVVZHVtTXEKS1NXNWFXUnBkZG05RG9pRklwM1dJN1BuMGk5QUFUdU0vM1hWeGd5VkNsdjhBZ1N5cUJuUWlYUGJ4SnlzZ3ptUgp4RVQ3cXpXMmo1eGl0R2NxVVlOaG9hR2FlUFIreWp4TEw5ZnpldERYMmN6RUI4bEhCTDRHd3dNPQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=")
+			.withMasterUrl("https://133.133.135.22:6443")
+			.build();
+	
+	public static ExtendedKubernetesClient getClient() throws Exception {
+		return new ExtendedKubernetesClient(config);
+	}
+}

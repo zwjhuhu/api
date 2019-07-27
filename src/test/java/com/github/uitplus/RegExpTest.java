@@ -13,17 +13,17 @@ public class RegExpTest {
 
 	protected static String NAME_PATTERN = "[a-z0-9-]{32}";
 	
-	protected static String PATH_PATTERN = "[a-z0-9/.:-]{1,1024}";
+	protected static String PATH_PATTERN = "[a-z0-9A-Z-_/./]{2,1024}";
 	
-	protected static String NUMB_PATTERN = "[1-9]|[10-99]\\d";
+	protected static String NUMB_PATTERN = "\\d{3,4}";
 	
 	protected static String ENUM_PATTERN = "qcow2|raw";
 
 	public static void main(String[] args) {
 //		checkName();
-//		checkPath();
+		checkPath();
 //		checkNumber();
-		checkEnum();
+//		checkEnum();
 	}
 
 	protected static void checkEnum()  {
@@ -33,12 +33,12 @@ public class RegExpTest {
 
 	protected static void checkNumber() {
 		Pattern r = Pattern.compile(NUMB_PATTERN);
-		System.out.println(r.matcher("0").matches());
+		System.out.println(r.matcher("700").matches());
 	}
 
 	protected static void checkPath() {
 		Pattern r = Pattern.compile(PATH_PATTERN);
-		System.out.println(r.matcher("A").matches());
+		System.out.println(r.matcher("/opt/ISO/CentOS-7-x86_64-Minimal-1511.iso").matches());
 	}
 
 	protected static void checkName() {

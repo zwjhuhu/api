@@ -70,7 +70,7 @@ public final class HttpController implements ApplicationContextAware {
 	 * @return           the {@code HttpBodyHandler} result. In fact, it may be an exception.
 	 * @throws Exception it can be any exception that {@code HttpBodyHandler} throws
 	 */
-	@RequestMapping(method = RequestMethod.POST, value = {"/**/login*", "/**/add*", "/**/create*", "/**/new*"})
+	@RequestMapping(method = RequestMethod.POST, value = {"/**/login*", "/**/start*", "/**/reset*", "/**/resume*", "/**/suspend*", "/**/stop*", "/**/reboot*", "/**/add*", "/**/create*", "/**/new*"})
 	public @ResponseBody String createTypeRequest(HttpServletRequest request, 
 											@RequestBody  JSONObject body) throws Exception{
  		return handleHttpRequest(getServletPath(request), body);
