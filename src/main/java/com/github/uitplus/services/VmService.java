@@ -1,0 +1,112 @@
+/*
+ * Copyright (2019, ) Institute of Software, Chinese Academy of Sciences
+ */
+package com.github.uitplus.services;
+
+import com.github.kubesys.kubernetes.ExtendedKubernetesClient;
+import com.github.kubesys.webfrk.annotations.ServiceDefinition;
+import com.github.kubesys.webfrk.annotations.handlers.HttpBodyHandler;
+import com.github.uitplus.beans.CreateVMFromISOBean;
+import com.github.uitplus.beans.CreateVMFromImageBean;
+import com.github.uitplus.beans.DeleteVMBean;
+import com.github.uitplus.beans.RebootVMBean;
+import com.github.uitplus.beans.RemoveVMBean;
+import com.github.uitplus.beans.ResetVMBean;
+import com.github.uitplus.beans.ResumeVMBean;
+import com.github.uitplus.beans.StartVMBean;
+import com.github.uitplus.beans.StopForceVMBean;
+import com.github.uitplus.beans.StopVMBean;
+import com.github.uitplus.beans.SuspendVMBean;
+import com.github.uitplus.utils.BeanConvertorUtils;
+
+import io.fabric8.kubernetes.client.Config;
+import io.fabric8.kubernetes.client.ConfigBuilder;
+
+/**
+ * @author wuheng@otcaix.iscas.ac.cn
+ * @since 2019/7/24
+ *
+ */
+@ServiceDefinition
+public class VmService extends HttpBodyHandler {
+
+	protected static ExtendedKubernetesClient client;
+	
+	static {
+		Config config = new ConfigBuilder()
+				.withApiVersion("v1")
+				.withCaCertData("LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUN5RENDQWJDZ0F3SUJBZ0lCQURBTkJna3Foa2lHOXcwQkFRc0ZBREFWTVJNd0VRWURWUVFERXdwcmRXSmwKY201bGRHVnpNQjRYRFRFNU1EY3lOakEzTVRneE5Wb1hEVEk1TURjeU16QTNNVGd4TlZvd0ZURVRNQkVHQTFVRQpBeE1LYTNWaVpYSnVaWFJsY3pDQ0FTSXdEUVlKS29aSWh2Y05BUUVCQlFBRGdnRVBBRENDQVFvQ2dnRUJBTy9LCkJkTGlnVS9ZbEcrTTFGbzV6Y3FOZ3FNZFk2TE5JaCsvMlEyMVJIVkkzNitxTFgyaSt3RTAwN0hEeW5ZSnlTaW8KaGJ5NVNKMHZvTjBsS2c5Z1pEMmh0WG9LRWFsVmJkU3ZCVTQrRmNhcFZSTkZhcm5Ta1hWQXJReVVDNHYrSmFrRwp4QXl2L3FHdHlVSkwrVnlMK0d2bFBlYmJqTml6dGpHY0RSS0laeDlTdUNubXVmUE9PZ29UNGZ6TFFEejNMUG9yClFoOW1rSlFCYkl0QjR5M2tDdWtLWk8yY0NueThMdStWa2oyekZnM3NRZTVVUEw3NmVybWIvYm82TVZ5bitQaHcKT1FmdWxPTVNBcnF4RTVnRk56d2NmcEI5cnRQd3ZseEY1bTA5R0xCMGRpUXJrQkZ4UXdEL3ZZVE5iZTBNdW1xRQpqQUdEV0sraDBqdlZRNi9FNktrQ0F3RUFBYU1qTUNFd0RnWURWUjBQQVFIL0JBUURBZ0trTUE4R0ExVWRFd0VCCi93UUZNQU1CQWY4d0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFBcEU1L1BhandPaVBNbnlubVVXOHpXdmRBUkoKRUh1VGhDSkdHTHNMaUtvSHZTNTMwRW9BbFkvV2w4UW9FZFNXcTJrTW5HOWhuWDRRbDZKSlJQWTQvaVpEM0xiOQpOQlFBSXJKK0IvbFZaeTZHR0tEa21LdFJKdDM3MW44bHg1TTFxMTZST0dwdTR5U0E1V2NSSjh0QlhWZkdZOU9wClA0V3BtZXlnMUVNUzh1dmNXVXVQRC9EQ1lsNy8zMWg2WW5VL2VHRmFpTzRyQ1ZyRTRxMmFjWW1nU21sTmRYNnkKVjA3RUhFSXRaWXdsNlNkN2x6YWJnOW52cnhaQ1lITFQ4cjBqaTk2Ni9ldzVXaFJXTHF3RUFXbmVmWTJKcUtTZwp6aFE3ejBFMDNBblBWUXdNL3NUTHdLdGtsZGVrbVVFNFJXRGRyTHFmQmxucFl1SU5TRmE3VEFMOTVsOD0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=")
+				.withClientCertData("LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUM4akNDQWRxZ0F3SUJBZ0lJUGsyK2lBNjRiRUV3RFFZSktvWklodmNOQVFFTEJRQXdGVEVUTUJFR0ExVUUKQXhNS2EzVmlaWEp1WlhSbGN6QWVGdzB4T1RBM01qWXdOekU0TVRWYUZ3MHlNREEzTWpVd056RTRNVGRhTURReApGekFWQmdOVkJBb1REbk41YzNSbGJUcHRZWE4wWlhKek1Sa3dGd1lEVlFRREV4QnJkV0psY201bGRHVnpMV0ZrCmJXbHVNSUlCSWpBTkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQXQ0VU52ZWc0WFlYS0lEWHUKV1FySUwyRXArMldLOFpSbTg0RUdjRlUyKzFMMTRhT3lON2p3dFlGRmZzY3hsclhhQVdEeEVsaTk4TkxBRHpJMwpHVkdabkVZYURVRU44MFArRk5JcUNYUGhUNjZVL1FXUGZiRzVBdmVUOFBaYk0zbmlYWjJCbWhDcGMrTXZ2LzA4Ck5lc3ludjFoSmNLdHBDU0ZKanFEc3ZzWDJOazI3Zit2Rkd5dkFJanMyMTdyc1lGMmVodWllQStwUGNZbmZFbkEKRCsrQVRxRFZQQkZ3ZzVGUCtUOVg5MVY3Z3pBZGR5SXMrajMrZ1pYazJGeWFyUmNDRFlrT3pHb1JzM1BuRHZ4bwp3YXdmc0I2eENyODJXeDNCeUVSdy82TU02OXFXSllzQWd4WmdYM2pCeTZXOGhCTGMrd2dkcTlDZk11MFkrckFWClBXeTdjUUlEQVFBQm95Y3dKVEFPQmdOVkhROEJBZjhFQkFNQ0JhQXdFd1lEVlIwbEJBd3dDZ1lJS3dZQkJRVUgKQXdJd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFFSEI0N2ZtTCsvSGRuNGoyanVjeTFLWEx4QnEyUHZ4ZnhoawpBeU1hc3dlTlB5dWtBZEpNeitPengzTjJxOG9qRUl0Z2J2QnJrUWRtU2tBZGtVTjY4cmpSK2ZtR1pIWFBrbGhHCjJlR3JCc25pMFZ5Y1JHNXphMHZudVZocHdVOEEyUFhBbG9CaXBydnppZFJDMXdCYVFVWURhT1BFeSs3c3VnQjcKK3lacGl6UmwzVFdZT0ZGS3lzZ1pNTzRya3VIb2VyclZlQk5aQlVvb1Z5U2RqUFRxZEpUb0hlYWVNVHBacThLbwppYXZHZEJ5cjdhME54SWEvYkpZS0pEcEVnSStDa3JBQzA1aUV5UzJ6MHhYVFllL0k2TG1TUnFnN1hIb2ROMVQrCnBjZWphNHhINEZvdy9MK2xnQUdQRTRDYUg5ODZXMHYzdXVEU2RKTDVsOEtXcnpDekFjVT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=")
+				.withClientKeyData("LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBdDRVTnZlZzRYWVhLSURYdVdRcklMMkVwKzJXSzhaUm04NEVHY0ZVMisxTDE0YU95Ck43and0WUZGZnNjeGxyWGFBV0R4RWxpOThOTEFEekkzR1ZHWm5FWWFEVUVOODBQK0ZOSXFDWFBoVDY2VS9RV1AKZmJHNUF2ZVQ4UFpiTTNuaVhaMkJtaENwYytNdnYvMDhOZXN5bnYxaEpjS3RwQ1NGSmpxRHN2c1gyTmsyN2YrdgpGR3l2QUlqczIxN3JzWUYyZWh1aWVBK3BQY1luZkVuQUQrK0FUcURWUEJGd2c1RlArVDlYOTFWN2d6QWRkeUlzCitqMytnWlhrMkZ5YXJSY0NEWWtPekdvUnMzUG5Ednhvd2F3ZnNCNnhDcjgyV3gzQnlFUncvNk1NNjlxV0pZc0EKZ3haZ1gzakJ5Nlc4aEJMYyt3Z2RxOUNmTXUwWStyQVZQV3k3Y1FJREFRQUJBb0lCQUNxOERBZ2w5RUlxN25kegp0NDM2aWNVbXJoMEJkMHBzRVZFd3dXd1ZHOW1JWndObEdCSUx1ZG02UVpHVkZ3SU9WTGF2ZVZPWllKbWNxZWFmCi9kNmlkcy9DTHp6WTRrTzhtSVVHcjQxRjg3aVhZZEJOcEMxVDNrNUhrcWF3NTJua1B3Y25yMDlPQS9lZGRyZ1IKWXh6M0tQR0c5VUZTeFJhTS9vaDVaY09lM3QyNnlocUsxakpOVElscU85OWpDa3ZIVWp2TTg2cU5TUGkvdDNWVwpXNWhiVFllRUp0NFRTWTY0b1BkMXhsNkx4akxGSldEdnJLNjkzZ2FVd1RuMzRHMmJmNmllS2VleGxMditNU0NoCi9LQ0JtczZTWEIwMmcybjFCYkJXc09JOERMN3JDN1dzcFh4U242UTByRDM4WVk1enk0ZThvS0g5Zm8vbnVxTFgKWmNoSmY5VUNnWUVBejZtR2duVW0yRjlKaUpLTTVuRkdHUjlYTENGclArQzFaSUlDVkVqdS9VZVZQWDhKaitYSwpPbWtPdmdDVDhVQ0MvOXFvQ0lzandXMmdweTdhWFd0bDZJL1R1QW9Ba0dEVmIrYUFCeW15RFJtSnBBMG1Hb2t6ClZmZ1EwN08vbFZKOGw2SlJ2cVJrWVJNb3FRZHFkR0xUSml6cXNnOVUwSVlpQjhJWGNxUXF3aDhDZ1lFQTRqemsKWXVjdGtXZTJ4ZWMrTUl5MjdYS3JHNVFTZ3pJMkRHcXduZWU3TjVQYnNieEtRdXFhWW5saFp2SkdWV1RiZ3lHQQpFZm1KRzJkSU1nWnNMSDJQN20yZjB5bmpPNHY1SmQ3WHR5L205ZnYzV3pPcllmYllzallFcUhnK0FFT0l1YzdKCndLdklNTjdWMmZOZ0FtcXFqWkJVcTVqQjZxcFcxNnlMQU9scmNHOENnWUVBdnkwRWhpbXdIMVpwN2U5dEErR1kKZFJ4ak5sOTF5eExtSzZkODJYZGpmWTFmR1lSUW0wY2ppKzZZQWRlcVcxbld3QkRlelM2N05pSGsyc1RKaDJPTwpLREh3NmVkYmFZK2NMeTUzQXlFaHArbXd5M1RIZFhxRjVray94SVlnaENteVJpN0xMc1ZOSEFsMVQxZGlhODluCk1DZjkwUHRJUzhpUW42L1J3bHJjZW1VQ2dZRUFnYzN5TkJUei9qT0ZtTEwrNlpneTlMWVFHcml3am5ubXJPVWkKQk5lS2dXN2laRzNtSmRLNVZiclMrZUFVSHJiSmc4bGEwL1ZhaDFDUkNiTEpxaFU0MmRJb0cxNHpORjB4VEZzNQpaYStrVW9xSTk5a0RnaWZCV1M3SktXZ2tHcjZrMmdjZGx1QjQ4aUZJamM2bnpYc3A5Q05Wa1VjS0svd2o2NGJpCkVsbmEvUjBDZ1lFQXVZMEwwUy81RXpKTHhST21LN0xpaHNrRUw5QS8xRU5GSXlseTcvakV3aTBGWjVVZHVtTXEKS1NXNWFXUnBkZG05RG9pRklwM1dJN1BuMGk5QUFUdU0vM1hWeGd5VkNsdjhBZ1N5cUJuUWlYUGJ4SnlzZ3ptUgp4RVQ3cXpXMmo1eGl0R2NxVVlOaG9hR2FlUFIreWp4TEw5ZnpldERYMmN6RUI4bEhCTDRHd3dNPQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=")
+				.withMasterUrl("https://133.133.135.22:6443")
+				.build();
+		
+		client = new ExtendedKubernetesClient(config);
+	}
+	
+	public boolean createVMFromISO(CreateVMFromISOBean bean) throws Exception {
+		client.virtualMachines().createAndStartVMFromISO(bean.getName(), 
+				BeanConvertorUtils.toCreateAndStartVMFromISO(bean));
+		return true;
+	}
+	
+	public boolean createVMFromImage(CreateVMFromImageBean bean) throws Exception {
+		client.virtualMachines().createAndStartVMFromImage(bean.getName(), 
+				BeanConvertorUtils.toCreateAndStartVMFromImage(bean));
+		return true;
+	}
+	
+	public boolean deleteVM(DeleteVMBean bean) throws Exception {
+		client.virtualMachines().temporaryDeleteVM(bean.getName(), 
+				BeanConvertorUtils.toDeleteVM(bean));
+		return true;
+	}
+	
+	public boolean rebootVM(RebootVMBean bean) throws Exception {
+		client.virtualMachines().rebootVM(bean.getName(), 
+				BeanConvertorUtils.toRebootVM(bean));
+		return true;
+	}
+	
+	public boolean removeVM(RemoveVMBean bean) throws Exception {
+		client.virtualMachines().deleteVM(bean.getName(), 
+				BeanConvertorUtils.toRemoveVM(bean));
+		return true;
+	}
+	
+	public boolean resetVM(ResetVMBean bean) throws Exception {
+		client.virtualMachines().resetVM(bean.getName(), 
+				BeanConvertorUtils.toResetVM(bean));
+		return true;
+	}
+	
+	public boolean resumeVM(ResumeVMBean bean) throws Exception {
+		client.virtualMachines().resumeVM(bean.getName(), 
+				BeanConvertorUtils.toResumeVM(bean));
+		return true;
+	}
+	
+	public boolean startVM(StartVMBean bean) throws Exception {
+		client.virtualMachines().startVM(bean.getName(), 
+				BeanConvertorUtils.toStartVM(bean));
+		return true;
+	}
+	
+	public boolean stopForceVM(StopForceVMBean bean) throws Exception {
+		client.virtualMachines().stopVMForce(bean.getName(), 
+				BeanConvertorUtils.toStopForceVM(bean));
+		return true;
+	}
+	
+	public boolean stopVM(StopVMBean bean) throws Exception {
+		client.virtualMachines().stopVM(bean.getName(), 
+				BeanConvertorUtils.toStopVM(bean));
+		return true;
+	}
+	
+	public boolean suspendVM(SuspendVMBean bean) throws Exception {
+		client.virtualMachines().suspendVM(bean.getName(), 
+				BeanConvertorUtils.toSuspendVM(bean));
+		return true;
+	}
+}
