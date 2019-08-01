@@ -17,7 +17,7 @@ import com.github.uitplus.beans.CreateVMFromISOBean.Network;
  * @author xuyuanjia2017@otcaix.iscas.ac.cn
  * @author xianghao16@otcaix.iscas.ac.cn
  * @author yangchen18@otcaix.iscas.ac.cn
- * @since Sat Jul 27 12:51:01 CST 2019
+ * @since Thu Aug 01 08:34:38 CST 2019
  **/
 public class CreateVMFromImageBean {
 
@@ -145,6 +145,8 @@ public class CreateVMFromImageBean {
 
 		protected Long writeSpeed;
 
+		protected Long diskBandwidth;
+
 		protected Long readingSpeed;
 
 		protected Long capacity;
@@ -162,6 +164,18 @@ public class CreateVMFromImageBean {
 
 		public Long getWriteSpeed() {
 			return this.writeSpeed;
+		}
+
+		public void setDiskBandwidth(Long diskBandwidth) {
+			Pattern p = Pattern.compile("\\d{8,10}");
+			if (!p.matcher(String.valueOf(diskBandwidth)).matches()) {
+				throw new RuntimeException("Invalid parameter.");
+			}
+			this.diskBandwidth = diskBandwidth;
+		}
+
+		public Long getDiskBandwidth() {
+			return this.diskBandwidth;
 		}
 
 		public void setReadingSpeed(Long readingSpeed) {

@@ -6,6 +6,7 @@ package com.github.kubesys.webfrk.core;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.lang.reflect.Parameter;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -200,7 +201,7 @@ public final class HttpController implements ApplicationContextAware {
 		// in our design , we only support two cases:
 		// 1. no parameter
 		// 2. only has one parameter
-		
+		// 3. more parameters
 		
 		if (targetMethod.getParameterCount() == 0) {
 			// if there is on parameter
@@ -221,7 +222,12 @@ public final class HttpController implements ApplicationContextAware {
 			} 
 			throw new Exception("If parameter has annotation, the annotation type must be 'javax.validation.Valid'");
 		} else {
-			throw new Exception("Only support one parameter.");
+			Parameter[] params = targetMethod.getParameters();
+			Object[] objs = new Object[params.length];
+			for (int i = 0; i < params.length; i++) {
+				objs[i] = body.get(params[i].getName());
+			}
+			return objs;
 		}
 		
 	}

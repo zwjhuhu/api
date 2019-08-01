@@ -76,6 +76,9 @@ public class BeanConvertorUtils {
 		StringBuffer csb = new StringBuffer();
 		RootCloudDiskSpecificationFromISO rootDisk = bean.getRootCloudDiskSpecificationFromISO();
 		dsb.append("--disk size=" + rootDisk.getCapacity());
+		if (rootDisk.getDiskBandwidth() != null) {
+			dsb.append(",total_bytes_sec=" + rootDisk.getDiskBandwidth());
+		}
 		if (rootDisk.getReadingSpeed() != null) {
 			dsb.append(",read_bytes_sec=" + rootDisk.getReadingSpeed());
 		}
@@ -125,6 +128,9 @@ public class BeanConvertorUtils {
 		StringBuffer csb = new StringBuffer();
 		RootCloudDiskSpecificationFromTemplate rootDisk = bean.getRootCloudDiskSpecificationFromTemplate();
 		dsb.append("--disk ROOTDISK");
+		if (rootDisk.getDiskBandwidth() != null) {
+			dsb.append(",total_bytes_sec=" + rootDisk.getDiskBandwidth());
+		}
 		if (rootDisk.getReadingSpeed() != null) {
 			dsb.append(",read_bytes_sec=" + rootDisk.getReadingSpeed());
 		}
@@ -176,6 +182,10 @@ public class BeanConvertorUtils {
 				dsb.append("--disk " +  dataDisk.getPath());
 			} else {
 				dsb.append("--disk size=" +  dataDisk.getCapacity());
+			}
+			
+			if (dataDisk.getDiskBandwidth() != null) {
+				dsb.append(",total_bytes_sec=" + dataDisk.getDiskBandwidth());
 			}
 			
 			if (dataDisk.getReadingSpeed() != null) {

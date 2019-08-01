@@ -41,17 +41,17 @@ public class APIWriter {
 	protected static final String prefix = "conf/beans/";
 	
 	static {
-//		configs.add("createVMFromImage.json");
+		configs.add("createVMFromImage.json");
 		configs.add("createVMFromISO.json");
-		configs.add("startVM.json");
-		configs.add("stopVM.json");
-		configs.add("stopForceVM.json");
-		configs.add("rebootVM.json");
-		configs.add("resetVM.json");
-		configs.add("suspendVM.json");
-		configs.add("resumeVM.json");
-		configs.add("deleteVM.json");
-		configs.add("removeVM.json");
+//		configs.add("startVM.json");
+//		configs.add("stopVM.json");
+//		configs.add("stopForceVM.json");
+//		configs.add("rebootVM.json");
+//		configs.add("resetVM.json");
+//		configs.add("suspendVM.json");
+//		configs.add("resumeVM.json");
+//		configs.add("deleteVM.json");
+//		configs.add("removeVM.json");
 	}
 	
 	public static void main(String[] args) throws Exception {

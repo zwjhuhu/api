@@ -126,8 +126,7 @@ public final class HandlerManager  {
 			return false;
 		}
 		
-		if (isValidRetrieveRequest(method) ||
-				isValidCreateOrUpdateOrDeleteRequest(method)) {
+		if (isValidRequest(method)) {
 			return true;
 		} else {
 			return false;
@@ -135,48 +134,64 @@ public final class HandlerManager  {
 		
 	}
 
-	private static boolean isValidCreateOrUpdateOrDeleteRequest(Method method) throws Exception {
+	private static boolean isValidRequest(Method method) throws Exception {
 		List<String> durlist = new ArrayList<String>();
 		durlist.addAll(serviceTypes.get("deleteType"));
 		durlist.addAll(serviceTypes.get("updateType"));
 		durlist.addAll(serviceTypes.get("createType"));
+		durlist.addAll(serviceTypes.get("retrieveType"));
 		for (String v : durlist) {
 			// it is a create, update, or delete request
 			if (method.getName().startsWith(v)){
-				// if the parameter count is 1
-				// it is a valid request
-				if (method.getParameterCount() == 1 ) {
-					return true;
-				} else {
-					throw new Exception(method.getName() + 
-							": Only support one parameter, and the "
-							+ "parameter class cannot be start with 'java.lang'.");
-				}
+				return true;
 			}
 		}
 		
 		return false;
 	}
-
-	private static boolean isValidRetrieveRequest(Method method) throws Exception {
-		List<String> clist = serviceTypes.get("retrieveType");
-		for (String v : clist) {
-			// it is a retrieve request
-			if (method.getName().startsWith(v)) {
-				// if the parameter count is 0, or if the parameter is a Map object
-				// it is a valid request
-				if ((method.getParameterCount() == 0) 
-						|| (method.getParameterCount() == 1 
-						   && method.getParameterTypes()[0].getAnnotations().length == 0
-							&& method.getParameterTypes()[0].getName().equals(Map.class.getName()))) {
-					return true;
-				} else {
-					throw new Exception(method.getName() + 
-							": Support no prameter or only a Map object");
-				}
-			} 
-		}
-		return false;
-	}
+	
+//	private static boolean isValidCreateOrUpdateOrDeleteRequest(Method method) throws Exception {
+//		List<String> durlist = new ArrayList<String>();
+//		durlist.addAll(serviceTypes.get("deleteType"));
+//		durlist.addAll(serviceTypes.get("updateType"));
+//		durlist.addAll(serviceTypes.get("createType"));
+//		for (String v : durlist) {
+//			// it is a create, update, or delete request
+//			if (method.getName().startsWith(v)){
+//				// if the parameter count is 1
+//				// it is a valid request
+//				if (method.getParameterCount() == 1 ) {
+//					return true;
+//				} else {
+//					throw new Exception(method.getName() + 
+//							": Only support one parameter, and the "
+//							+ "parameter class cannot be start with 'java.lang'.");
+//				}
+//			}
+//		}
+//		
+//		return false;
+//	}
+//
+//	private static boolean isValidRetrieveRequest(Method method) throws Exception {
+//		List<String> clist = serviceTypes.get("retrieveType");
+//		for (String v : clist) {
+//			// it is a retrieve request
+//			if (method.getName().startsWith(v)) {
+//				// if the parameter count is 0, or if the parameter is a Map object
+//				// it is a valid request
+//				if ((method.getParameterCount() == 0) 
+//						|| (method.getParameterCount() == 1 
+//						   && method.getParameterTypes()[0].getAnnotations().length == 0
+//							&& method.getParameterTypes()[0].getName().equals(Map.class.getName()))) {
+//					return true;
+//				} else {
+//					throw new Exception(method.getName() + 
+//							": Support no prameter or only a Map object");
+//				}
+//			} 
+//		}
+//		return false;
+//	}
 		
 }

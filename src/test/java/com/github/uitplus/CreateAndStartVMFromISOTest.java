@@ -47,7 +47,8 @@ public class CreateAndStartVMFromISOTest  {
 		
 		ArrayList<Network> networks = new ArrayList<Network>();
 		Network n1 = new Network();
-		n1.setBridge("virbr0");
+//		n1.setBridge("virbr0");
+		n1.setBridge("native");
 		Network n2 = new Network();
 		n2.setBridge("virbr0");
 		networks.add(n1);
